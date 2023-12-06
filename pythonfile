@@ -1,0 +1,92 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+accident_dataset = pd.read_csv("US_Accidents_March23.csv")
+
+accident_dataset.head()
+
+accident_dataset.shape
+
+accident_dataset.info()
+
+accident_dataset.describe()
+
+#How many  numeric columns are there in the dataset?
+numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
+numeric_dataset = accident_dataset.select_dtypes(include=numerics)
+print(numeric_dataset.shape)
+numeric_dataset
+
+#How many NULL values are there in each column?
+accident_dataset.isnull().sum().sort_values(ascending=False)
+
+#What is the percentage of NULL values in each column?
+missing_val = accident_dataset.isnull().sum().sort_values(ascending=False)/len(accident_dataset) * 100
+missing_val[missing_val>0]
+
+pip install missingno
+
+#Visulaize the number of missing values in our dataset
+import missingno as msn
+msn.bar(accident_dataset)
+
+accident_dataset['Weather_Condition'].isnull().sum()
+
+    cities = accident_dataset['City']
+    cities
+
+unique_cities = cities.unique()
+print("The number of unique cities where accidents have taken place in USA: ",len(unique_cities))
+unique_cities
+
+unique_city_count = cities.value_counts()
+unique_city_count
+
+print("The Top 10 Cities of USA with highest number of accidents are:")
+unique_city_count[:11]
+
+unique_city_count[:20].plot(kind='barh')
+
+percent_moreThan1000 = len(unique_city_count[unique_city_count>1000]) / len(unique_city_count) * 100
+print("The percentage of cities have more than 1000 accidents in a year is: ", percent_moreThan1000, " which is less than 5%")
+
+high_accident_cities = unique_city_count[unique_city_count>1000]
+sns.distplot(high_accident_cities)
+
+
+one_accident_cities = unique_city_count[unique_city_count == 1]
+one_accident_cities
+print(len(one_accident_cities))
+
+accident_dataset['Start_Time']
+
+accident_dataset['Start_Time'].dt.dayofweek.value_counts()
+#The day of the week with Monday=0, Sunday=6.
+
+sns.distplot(accident_dataset['Start_Time'].dt.dayofweek)
+
+state_wise_counts= accident_dataset['State'].value_counts()[:20]
+state_wise_counts
+
+state_wise_counts[:11].plot(kind='barh')
+
+list(zip(accident_dataset['Start_Lat'],accident_dataset['Start_Lng']))[:10]
+
+from folium import plugins
+from folium.plugins import HeatMap
+
+import folium
+from folium.plugins import HeatMap
+
+# Assuming accident_dataset is a DataFrame with 'Start_Lat' and 'Start_Lng' columns
+
+# Create a folium map centered at a specific location or use the default settings
+mapWorld = folium.Map()
+
+# Create a HeatMap using latitude and longitude data from accident_dataset
+HeatMap(list(zip(accident_dataset['Start_Lat'], accident_dataset['Start_Lng']))).add_to(mapWorld)
+
+# Display the map
+mapWorld
